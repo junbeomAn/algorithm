@@ -18,7 +18,7 @@ while True:
 		acc += nums[e]
 		e += 1
 
-if res == 100000:
+if res == 1000000:
 	print(0)
 else:
 	print(res)
