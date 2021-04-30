@@ -10,6 +10,8 @@ m=int(input())
 
 def dfs(acc,cnt):
 	global minCount
+	if cnt>minCount:
+		return
 	if acc==m:
 		minCount=min(cnt,minCount)
 		return
@@ -19,5 +21,6 @@ def dfs(acc,cnt):
 			dfs(acc+i,cnt+1)
 if __name__=="__main__":
 	minCount=float("inf")
+	coin.sort(reverse=True)
 	dfs(0,0)
 	print(minCount)

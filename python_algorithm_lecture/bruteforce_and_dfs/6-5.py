@@ -7,17 +7,20 @@ c,n=map(int, input().split())
 w=[int(input()) for _ in range(n)]
 res=0
 
-def dfs(x,acc):
+def dfs(x,acc,tsum):
 	global res
+	if acc+(total-tsum)<res:
+		return
 	if acc > c:
 		return
-	res=max(res,acc)
 	if x == n:
+		res=max(res,acc)
 		return
 	else:
-		dfs(x+1,acc)
-		dfs(x+1,acc+w[x])
+		dfs(x+1,acc,tsum+w[x])
+		dfs(x+1,acc+w[x],tsum+w[x])
 
 if __name__=="__main__":
-	dfs(0,0)
+	total=sum(w)
+	dfs(0,0,0)
 	print(res)
