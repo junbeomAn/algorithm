@@ -3,6 +3,8 @@ import sys
 p=os.path.dirname(os.path.realpath(__file__))
 sys.stdin=open(p+"/input.txt","rt")
 
+# 조합
+
 def dfs(L,acc):
 	if L==k:
 		if 0<acc<=S:

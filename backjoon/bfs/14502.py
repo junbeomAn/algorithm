@@ -1,30 +1,30 @@
-# from itertools import combinations
 import sys
-from collections import Counter, deque
-from itertools import chain
-
-input=sys.stdin.readline
+from collections import deque
 lst=[]
-res=[(0,0)] * 3
-combi=[]
 n, m=map(int, input().split())
 board=[list(map(int, input().split())) for _ in range(n)]
 virus_location=[]
+safe_cnt=0
 
 for i in range(n):
 	for j in range(m):
 		if board[i][j]==0:
 			lst.append((i, j))
+			safe_cnt+=1
 		if board[i][j]==2:
 			virus_location.append((i, j))
 
 def dfs(L, x):
 	if L==3:
-		combi.append(res[0:])
+		return bfs(safe_cnt-3)
 	else:
+		res=0
 		for i in range(x, len(lst)):
-			res[L]=lst[i]
-			dfs(L+1, i+1)
+			x, y=lst[i]
+			board[x][y]=1
+			res=max(res, dfs(L+1, i+1))
+			board[x][y]=0
+	return res
 
 def bfs(safe):
 	q=deque()
@@ -45,22 +45,5 @@ def bfs(safe):
 				safe-=1
 	return safe
 
-dfs(0, 0)
+print(dfs(0, 0))
 
-safe_cnt=Counter(chain(*board))[0]
-ans=0
-
-for case in combi:
-	change=[]
-
-	for x, y in case:
-		if board[x][y]==0:
-			board[x][y]=1
-			change.append((x, y))
-
-	if len(change)==3:
-		ans=max(ans, bfs(safe_cnt-3))
-	for x, y in change:
-		board[x][y]=0
-
-print(ans)
