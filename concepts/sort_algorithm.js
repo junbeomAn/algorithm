@@ -197,15 +197,19 @@ function heapSort (heap) {
 
 // heapSort(arr);
 
-
+function swap(q, i, j) {
+  const temp = q[i];
+  q[i] = q[j];
+  q[j] = temp;
+}
 
 function heapPush(q, node) {
   q.push(node);
   let index = q.length - 1;
   let parentIndex = Math.floor((index - 1) / 2);
 
-  while (index > 0 && q[index][1] < q[parentIndex][1]) {
-    [q[index], q[parentIndex]] = [q[parentIndex], q[index]];
+  while (index > 0 && q[index] < q[parentIndex]) {
+    swap(q, index, parentIndex);
     index = parentIndex;
     parentIndex = Math.floor((index - 1) / 2);
   }
@@ -215,7 +219,6 @@ function heapPop(q) {
   const ret = q[0];
 
   let index = 0;
-  let stop = false;
   let child;
 
   q[0] = q[q.length - 1];
@@ -225,22 +228,23 @@ function heapPop(q) {
     return ret;
   }
 
-  while (!stop && q.length > 1) {
+  while (q.length > 1) {
     child = index * 2 + 1;
     if (child >= q.length) {
-      stop = true;
-      continue;
-    }
-    if (child < q.length - 1 && q[child][1] > q[child + 1][1]) {
-      child = child + 1;
+      break;
     }
 
-    if (child !== index && (q[child][1] < q[index][1])) {
-      [q[child], q[index]] = [q[index], q[child]];
-      index = child;
-    } else {
-      stop = true;
+    if (child < q.length - 1 && q[child] > q[child + 1]) {
+      child = child + 1;
     }
+    if (child === index) {
+      break;
+    }
+    if (q[child] > q[index]) {
+      break;
+    }
+    swap(q, index, child);
+    index = child;
   }
 
   return ret;
