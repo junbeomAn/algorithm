@@ -1,19 +1,19 @@
-// const fs = require('fs');
-// const input = fs.readFileSync('/dev/stdin').toString().trim().split('\n').map(Number);
-input = `6
-5
-4
-4
-4
-3
-3`.split('\n').map(Number)
+const fs = require('fs');
+const input = fs.readFileSync('/dev/stdin').toString().split('\n');
+
+function swap(q, i, j) {
+  const temp = q[i];
+  q[i] = q[j];
+  q[j] = temp;
+}
+
 function minHeapPush(q, node) {
   q.push(node);
   let index = q.length - 1;
   let parentIndex = Math.floor((index - 1) / 2);
 
   while (index > 0 && q[index] < q[parentIndex]) {
-    [q[index], q[parentIndex]] = [q[parentIndex], q[index]];
+    swap(q, index, parentIndex);
     index = parentIndex;
     parentIndex = Math.floor((index - 1) / 2);
   }
@@ -25,7 +25,7 @@ function maxHeapPush(q, node) {
   let parentIndex = Math.floor((index - 1) / 2);
 
   while (index > 0 && q[index] > q[parentIndex]) {
-    [q[index], q[parentIndex]] = [q[parentIndex], q[index]];
+    swap(q, index, parentIndex);
     index = parentIndex;
     parentIndex = Math.floor((index - 1) / 2);
   }
@@ -35,7 +35,6 @@ function minHeapPop(q) {
   const ret = q[0];
 
   let index = 0;
-  let stop = false;
   let child;
 
   q[0] = q[q.length - 1];
@@ -45,22 +44,23 @@ function minHeapPop(q) {
     return ret;
   }
 
-  while (!stop && q.length > 1) {
+  while (q.length > 1) {
     child = index * 2 + 1;
     if (child >= q.length) {
-      stop = true;
-      continue;
+      break;
     }
+
     if (child < q.length - 1 && q[child] > q[child + 1]) {
       child = child + 1;
     }
-
-    if (child !== index && (q[child] < q[index])) {
-      [q[child], q[index]] = [q[index], q[child]];
-      index = child;
-    } else {
-      stop = true;
+    if (child === index) {
+      break;
     }
+    if (q[child] > q[index]) {
+      break;
+    }
+    swap(q, index, child);
+    index = child;
   }
 
   return ret;
@@ -70,7 +70,6 @@ function maxHeapPop(q) {
   const ret = q[0];
 
   let index = 0;
-  let stop = false;
   let child;
 
   q[0] = q[q.length - 1];
@@ -80,64 +79,73 @@ function maxHeapPop(q) {
     return ret;
   }
 
-  while (!stop && q.length > 1) {
+  while (q.length > 1) {
     child = index * 2 + 1;
     if (child >= q.length) {
-      stop = true;
-      continue;
+      break;
     }
+
     if (child < q.length - 1 && q[child] < q[child + 1]) {
       child = child + 1;
     }
-
-    if (child !== index && (q[child] > q[index])) {
-      [q[child], q[index]] = [q[index], q[child]];
-      index = child;
-    } else {
-      stop = true;
+    if (child === index) {
+      break;
     }
+    if (q[child] < q[index]) {
+      break;
+    }
+    swap(q, index, child);
+    index = child;
   }
 
   return ret;
 }
 
-let mid = +input[1];
-console.log(mid)
-
 const minHeap = [];
 const maxHeap = [];
+let res = '';
+let temp;
 
-for (let i = 2; i <= +input[0]; i++) {
+for (let i = 1; i <= +input[0]; i++) {
   const num = +input[i];
-  if (maxHeap.length === minHeap.length) {
-    // 범위 양쪽이 같다.
-    // mid 랑 비교후 크면 minheap
-    // 숫자가 작으면 mid를 minheap에 넣고 작은 수로 mid 갱신.
-    if (num >= mid) {
-      minHeapPush(minHeap, num);
+
+  if (maxHeap.length === 0) {
+    maxHeap.push(num);
+  } else if (minHeap.length === 0) {
+    if (maxHeap[0] < num) {
+      minHeap.push(num)
     } else {
-      minHeapPush(minHeap, mid);
-      mid = num;
+      temp = maxHeap.pop();
+      maxHeap.push(num);
+      minHeap.push(temp);
     }
+  } else if (maxHeap.length === minHeap.length) {
+      if (minHeap[0] > num) {
+        maxHeapPush(maxHeap, num);
+      } else {
+        temp = minHeapPop(minHeap);
+        minHeapPush(minHeap, num);
+        maxHeapPush(maxHeap, temp);
+      }
+  } else if (maxHeap.length > minHeap.length) {
+      if (maxHeap[0] < num) {
+        minHeapPush(minHeap, num);
+      } else {
+        temp = maxHeapPop(maxHeap);
+        maxHeapPush(maxHeap, num);
+        minHeapPush(minHeap, temp);
+      }
   } else if (maxHeap.length < minHeap.length) {
-    // 왼쪽 범위가 더 작다
-    // mid 랑 비교 후 숫자가 크면 mid를 max heap에 넣고, mid엔 숫자
-    // 숫자가 작으면 max heap에 넣는다(작은쪽)
-    if (num >= mid) {
-      maxHeapPush(maxHeap, mid);
-      mid = num;
-    } else {
-      maxHeapPush(maxHeap, num);
-    }
+      if (minheap[0] > num) {
+        maxHeapPush(maxHeap, num);
+      } else {
+        temp = minHeapPop(minHeap);
+        minHeapPush(minHeap, num);
+        maxHeapPush(maxHeap, temp);
+      }
   }
-  // else if (maxHeap.length > minHeap.length) {
-  //   // 오른쪽 범위가 더 작다.
-  //   // mid 랑 비교후 작으면 maxheap
-  //   // 숫자가 크면 min heap
-  // }
-  console.log(num, mid);
-  console.log(maxHeap, minHeap)
+  res += (maxHeap[0] + '\n');
 }
 
-
+console.log(res)
 
