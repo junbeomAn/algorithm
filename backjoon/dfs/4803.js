@@ -1,28 +1,9 @@
-// const fs = require("fs");
-// const input = fs
-//   .readFileSync("/dev/stdin")
-//   .toString()
-//   .trim()
-//   .split("\n");
-
-input = `6 3
-1 2
-2 3
-3 4
-6 5
-1 2
-2 3
-3 4
-4 5
-5 6
-6 6
-1 2
-2 3
-1 3
-4 5
-5 6
-6 4
-0 0`.split("\n");
+const fs = require("fs");
+const input = fs
+  .readFileSync("/dev/stdin")
+  .toString()
+  .trim()
+  .split("\n");
 
 const testcases = [];
 let i = 0;
@@ -55,25 +36,38 @@ testcases.forEach((testcase, i) => {
     .map(_ => Array());
   edges.forEach(([s, e]) => {
     adjs[s].push(e);
+    adjs[e].push(s);
   });
   const visited = Array(N + 1).fill(false);
+  const parent = Array(N + 1).fill(0);
 
-  function dfs(node) {
-    adjs[node].forEach(nextNode => {
-      if (visited[nextNode]) {
-        cycle = true;
-        return;
-      }
+  function bfs(start) {
+    const q = [];
+    q.push(start);
+    visited[start] = true;
 
-      visited[nextNode] = true;
-      dfs(nextNode);
-    });
+    while (q.length) {
+      const node = q.shift();
+
+      adjs[node].forEach(nextNode => {
+        if (visited[nextNode] && parent[node] !== nextNode) {
+          cycle = true;
+          return;
+        }
+        if (visited[nextNode]) return;
+
+        visited[nextNode] = true;
+        parent[nextNode] = node;
+        q.push(nextNode);
+      });
+    }
   }
+
   for (let i = 1; i <= N; i++) {
     cycle = false;
     if (visited[i]) continue;
-
-    dfs(i);
+    visited[i] = true;
+    bfs(i);
     if (cycle) continue;
     count += 1;
   }
