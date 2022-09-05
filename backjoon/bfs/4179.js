@@ -1,14 +1,10 @@
-// const fs = require('fs');
-// const input = fs
-//   .readFileSync('/dev/stdin')
-//   .toString()
-//   .trim()
-//   .split('\n');
-input = `4 4
-####
-#JF#
-#..#
-#..#`.split('\n');
+const fs = require('fs');
+const input = fs
+  .readFileSync('/dev/stdin')
+  .toString()
+  .trim()
+  .split('\n');
+
 const [r, c] = input[0].split(' ').map(Number);
 
 function checkRange(x, y, r, c) {
@@ -60,9 +56,6 @@ function bfs() {
   while (jq.length) {
     const [cx, cy, jMove] = jq.shift();
 
-    if (jMove >= fDist[cx][cy]) {
-      return 'IMPOSSIBLE';
-    }
     for (let i = 0; i < dx.length; i++) {
       const nx = cx + dx[i];
       const ny = cy + dy[i];
@@ -72,6 +65,7 @@ function bfs() {
       }
       if (jVisit[nx][ny]) continue;
       if (['#', 'F'].includes(board[nx][ny])) continue;
+      if (fDist[nx][ny] !== -1 && jMove + 1 >= fDist[nx][ny]) continue;
 
       jVisit[nx][ny] = true;
       jq.push([nx, ny, jMove + 1]);
