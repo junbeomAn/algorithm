@@ -65,7 +65,7 @@ function bfs() {
       }
       if (jVisit[nx][ny]) continue;
       if (['#', 'F'].includes(board[nx][ny])) continue;
-      if (fDist[nx][ny] !== -1 && jMove + 1 >= fDist[nx][ny]) continue;
+      if (fDist[nx][ny] !== -1 && jMove + 1 >= fDist[nx][ny]) continue; // 지훈이가 잡히는게 아닌, 불이 먼저 번진 곳을 가지를 않는다. 그러다 갈곳이 없어지면 impossible.
 
       jVisit[nx][ny] = true;
       jq.push([nx, ny, jMove + 1]);
